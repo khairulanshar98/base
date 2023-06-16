@@ -1,27 +1,28 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import ReactDOMClient from "react-dom/client";
 import singleSpaReact from "single-spa-react";
-import Root from "./root.component";
+import App from "./root.component";
 
 const lifecycles = singleSpaReact({
   React,
   ReactDOM,
-  rootComponent: Root,
+  rootComponent: App,
   errorBoundary(err, info, props) {
     // Customize the root error boundary for your microfrontend here.
-    return <div>err.message</div>;
+    return <span>{err.message}</span>;
   },
 });
 
 export const { bootstrap, unmount } = lifecycles;
 const rootElement = document.getElementById(
-  //@ts-ignore
-  `${window.single_container_id}`
+  `${process.env.MFE_APP_TARGET_ROOT}`
 );
 function MountComponent() {
   return Promise.resolve().then(() => {
     if (rootElement) {
-      ReactDOM.render(<Root />, rootElement);
+      const root = ReactDOMClient.createRoot(rootElement);
+      root.render(<App />);
     }
   });
 }
